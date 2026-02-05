@@ -37,7 +37,10 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
     
-    - name: Build and Push Docker image
+    - name: Build Docker image
       run: |
-        docker build -t ghcr.io/${{ github.repository }}/qa-mlops-app:latest
-        docker push ghcr.io/${{ github.repository }}/qa-mlops-app:latest .
+        docker build -t ghcr.io/${{ github.repository }}/qa-mlops-app:latest .
+
+    - name: Push Docker image
+      run: |
+        docker push ghcr.io/${{ github.repository }}/qa-mlops-app:latest
