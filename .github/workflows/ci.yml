@@ -21,14 +21,14 @@ jobs:
       with:
         python-version: '3.12'
 
-    - name: Cache Python dependencies
-      uses: actions/cache@v3
-      with:
-        path: |
-          ~/.cache/pip
-          # if your Makefile installs packages in a virtualenv:
-          .venv
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+    # - name: Cache Python dependencies
+    #   uses: actions/cache@v3
+    #   with:
+    #     path: |
+    #       ~/.cache/pip
+    #       # if your Makefile installs packages in a virtualenv:
+    #       .venv
+    #     key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
         
     - name: Install dependencies
       run: make install
@@ -48,7 +48,7 @@ jobs:
     
     - name: Build Docker image
       run: |
-        docker build -t ghcr.io/${{ github.repository}}/qa-mlops-app:latest -f docker/Dockerfile docker/
+        docker build -t ghcr.io/${{ github.repository }}/qa-mlops-app:latest -f docker/Dockerfile docker/
 
     - name: Push Docker image
       run: |
