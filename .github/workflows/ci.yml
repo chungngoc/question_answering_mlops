@@ -48,7 +48,7 @@ jobs:
     
     - name: Build Docker image
       run: |
-        docker build -t ghcr.io/${{ github.repository | lower }}/qa-mlops-app:latest -f docker/Dockerfile docker/
+        docker build -t ghcr.io/${{ github.repository}}/qa-mlops-app:latest -f docker/Dockerfile docker/
 
     - name: Push Docker image
       run: |
