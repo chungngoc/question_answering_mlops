@@ -4,10 +4,11 @@ from app.schemas import QARequest, QAResponse
 from app.model import QAModel
 from app.dependencies import get_qa_model
 from app.logging import get_logger
+from app.config import settings
 
 logger = get_logger(__name__)
 
-app = FastAPI(title="Question Answering API")
+app = FastAPI(title=settings.app_name, version="1.0.0", description="A simple question-answering API using Hugging Face Transformers.")
 
 @app.middleware("http")
 async def log_request_time(request: Request, call_next):

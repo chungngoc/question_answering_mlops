@@ -1,6 +1,7 @@
 import threading
 from transformers import pipeline
 from app.logging import get_logger
+from app.config import settings
 
 logger = get_logger(__name__)
 
@@ -16,7 +17,7 @@ class QAModel:
         if cls._instance is None:
             with cls._lock:
                 if cls._instance is None:
-                    logger.info("Loading QA model...")
+                    logger.info(f"Loading QA model {settings.model_name}...")
                     cls._instance = super(QAModel, cls).__new__(cls)
                     cls._instance._load_model()
                     logger.info("QA model loaded successfully")
@@ -25,7 +26,7 @@ class QAModel:
     def _load_model(self):
         self.pipeline = pipeline(
             "question-answering",
-            model="distilbert-base-cased-distilled-squad"
+            model=settings.model_name
         )
 
     def predict(self, question:str, context:str)-> dict:

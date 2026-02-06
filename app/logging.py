@@ -1,5 +1,6 @@
 import logging
 import sys
+from app.config import settings
 
 def get_logger(name: str) -> logging.Logger:
     """
@@ -12,7 +13,7 @@ def get_logger(name: str) -> logging.Logger:
         logging.Logger: A configured logger instance.
     """
     logger = logging.getLogger(name)
-    logger.setLevel(logging.INFO)
+    logger.setLevel(settings.log_level.upper())
 
     # Create console handler and set level to debug
     handler = logging.StreamHandler(sys.stdout)
