@@ -3,6 +3,8 @@ from fastapi import FastAPI, Depends, Request
 from app.schemas import QARequest, QAResponse
 from app.model import QAModel
 from app.dependencies import get_qa_model
+from app.retriever import get_retriever
+from app.vector_store import VectorStore
 from app.logging import get_logger
 from app.config import settings
 
@@ -27,6 +29,7 @@ async def log_request_time(request: Request, call_next):
 async def predict(
         request: QARequest,
         model: QAModel = Depends(get_qa_model),
+        retriever: VectorStore = Depends(get_retriever),
     ):
     """
     Predict the answer to a question based on the provided context.
@@ -38,10 +41,21 @@ async def predict(
     Returns:
     - QAResponse object containing the predicted answer.
     """
-    answer = model.predict(request.question, request.context)
+    # Retrieve relevant documents from the vector store
+    docs = retriever.search(request.question, top_k=3)
+
+    # Build context from retrieved chunks
+    context = " ".join([doc["text"] for doc in docs])
+
+    # Run QA model
+    answer = model.predict(
+        question=request.question,
+        context=context
+    )
     return {
         "answer": answer["answer"],
-        "score": answer["score"]
+        "score": answer["score"],
+        "source": [doc["source"] for doc in docs]
     }
 
 @app.get("/")
