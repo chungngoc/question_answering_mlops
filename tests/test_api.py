@@ -2,6 +2,8 @@ from fastapi.testclient import TestClient
 from app.main import app
 from app.retriever import get_retriever
 from app.dependencies import get_qa_model
+from app.config import settings
+from app.generator import Generator
 
 # Mock comqponents for testing
 class MockQAModel:
@@ -28,6 +30,8 @@ client = TestClient(app)
 
 # Tests
 def test_predict_rag_endpoint():
+    # Force RAG mode for testing
+    settings.rag_mode = "extractive"
     # Sample input for testing
     payload = {
         "question": "What is the capital of France?"
@@ -47,6 +51,28 @@ def test_predict_rag_endpoint():
     assert isinstance(data["answer"], str)
     assert data["score"] >= 0 and data["score"] <= 1
     assert "source" in data
+    assert "doc1" in data["source"]
+
+def test_rag_generative(monkeypatch):
+    # Force RAG mode to generative for testing
+    settings.rag_mode = "generative"
+    
+    class MockGenerator:
+        def generate(self, prompt: str):
+            return "Paris is the capital of France."
+    
+    monkeypatch.setattr("app.main.Generator", lambda: MockGenerator())
+
+    response = client.post(
+        "/predict",
+        json={"question": "What is the capital of France?"}
+    )
+
+    assert response.status_code == 200
+    data = response.json()
+
+    assert "Paris is the capital of France." in data["answer"]
+    assert data["score"] == 1.0
     assert "doc1" in data["source"]
 
 def test_version_endpoint():

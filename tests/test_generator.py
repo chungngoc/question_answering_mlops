@@ -12,4 +12,4 @@ def test_generator(mocker):
 
     text = gen.generate("What is the capital of France?")
 
-    assert "Paris" in text
+    assert "paris" in text

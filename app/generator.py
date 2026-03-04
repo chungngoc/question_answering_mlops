@@ -1,6 +1,6 @@
 import threading
 import torch
-from transformers import pipeline
+from transformers import  AutoTokenizer, AutoModelForSeq2SeqLM
 from app.logging import get_logger
 
 logger = get_logger(__name__)
@@ -21,16 +21,24 @@ class Generator:
         return cls._instance
 
     def _load_model(self):
-        self.pipeline = pipeline(
-            "text-generation",
-            model="google/flan-t5-small",
-            max_length=256,
-            device=0 if torch.cuda.is_available() else -1,
-        )
+        model_name = "google/flan-t5-large"
+        self.tokenizer = AutoTokenizer.from_pretrained(model_name)
+        self.model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
+        if torch.cuda.is_available():
+            self.model.to("cuda")
+            logger.info("Generative model moved to GPU")
     
     def generate(self, prompt: str) -> str:
+        inputs = self.tokenizer(prompt, return_tensors="pt", truncation=True, max_length=512)
         logger.info(f"Generating response for prompt: {prompt}")
-        result = self.pipeline(prompt, num_return_sequences=1)
-        generated_text = result[0]['generated_text']
+        with torch.no_grad():
+            outputs = self.model.generate(
+                **inputs,
+                max_new_tokens=200,
+                num_beams=4,
+                early_stopping=True,
+                no_repeat_ngram_size=2,
+            )
+        generated_text = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
         logger.info(f"Generated response: {generated_text}")
         return generated_text

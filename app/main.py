@@ -7,6 +7,8 @@ from app.retriever import get_retriever
 from app.vector_store import VectorStore
 from app.logging import get_logger
 from app.config import settings
+from app.generator import Generator
+from app.prompts import build_rag_prompt
 
 logger = get_logger(__name__)
 
@@ -42,19 +44,36 @@ async def predict(
     - QAResponse object containing the predicted answer.
     """
     # Retrieve relevant documents from the vector store
-    docs = retriever.search(request.question, top_k=3)
+    docs = retriever.search(request.question, top_k=2)
 
     # Build context from retrieved chunks
     context = " ".join([doc["text"] for doc in docs])
 
-    # Run QA model
-    answer = model.predict(
-        question=request.question,
-        context=context
-    )
+    # Choose answering strategy
+    if settings.rag_mode.lower() == "generative":
+        logger.info("Using RAG generative mode")
+        # Build RAG prompt
+        prompt = build_rag_prompt(
+            question=request.question,
+            context=context
+        )
+        # Run generative model
+        generator = Generator()
+        answer = generator.generate(prompt)
+        score = 1.0  # Generative models don't provide a score, so we set it to 1.0
+    else:
+        logger.info("Using RAG extractive mode")
+        # Use extractive QA model
+        result = model.predict(
+            question=request.question,
+            context=context
+        )
+        answer = result["answer"]
+        score = result["score"]
+
     return {
-        "answer": answer["answer"],
-        "score": answer["score"],
+        "answer": answer,
+        "score": score,
         "source": [doc["source"] for doc in docs]
     }
 

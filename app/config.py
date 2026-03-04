@@ -9,6 +9,9 @@ class Settings(BaseSettings):
     # Model settings
     model_name: str = "distilbert-base-cased-distilled-squad"
 
+    # RAG model settings
+    rag_mode: str = "extractive"  # or "generative"
+
     # Logging settings
     log_level: str = "INFO"
 
@@ -16,7 +19,7 @@ class Settings(BaseSettings):
     port: int = 8000
 
     class Config:
-        env_prefic = ""
+        env_prefix = ""
         case_sensitive = False
 
 settings = Settings()
