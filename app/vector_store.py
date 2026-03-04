@@ -6,6 +6,7 @@ from app.logging import get_logger
 
 logger = get_logger(__name__)
 
+
 class VectorStore:
     _instance = None
     _lock = threading.Lock()
@@ -18,9 +19,9 @@ class VectorStore:
                     cls._instance = super().__new__(cls)
                     cls._instance._build_index()
                     logger.info("FAISS index built successfully.")
-        
+
         return cls._instance
-    
+
     def _build_index(self):
         self.documents = load_document()
         texts = [doc["text"] for doc in self.documents]
@@ -43,5 +44,5 @@ class VectorStore:
         for idx in indices[0]:
             if idx < len(self.documents):
                 results.append(self.documents[idx])
-        
+
         return results

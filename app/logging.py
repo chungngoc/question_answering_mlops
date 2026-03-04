@@ -2,6 +2,7 @@ import logging
 import sys
 from app.config import settings
 
+
 def get_logger(name: str) -> logging.Logger:
     """
     Get a logger with the specified name.
@@ -19,7 +20,9 @@ def get_logger(name: str) -> logging.Logger:
     handler = logging.StreamHandler(sys.stdout)
 
     # Create formatter
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    formatter = logging.Formatter(
+        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    )
 
     # Add formatter to handler
     handler.setFormatter(formatter)

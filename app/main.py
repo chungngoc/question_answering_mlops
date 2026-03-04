@@ -12,7 +12,12 @@ from app.prompts import build_rag_prompt
 
 logger = get_logger(__name__)
 
-app = FastAPI(title=settings.app_name, version="1.0.0", description="A simple question-answering API using Hugging Face Transformers.")
+app = FastAPI(
+    title=settings.app_name,
+    version="1.0.0",
+    description="A simple question-answering API using Hugging Face Transformers.",
+)
+
 
 @app.middleware("http")
 async def log_request_time(request: Request, call_next):
@@ -27,12 +32,13 @@ async def log_request_time(request: Request, call_next):
     )
     return response
 
+
 @app.post("/predict", response_model=QAResponse)
 async def predict(
-        request: QARequest,
-        model: QAModel = Depends(get_qa_model),
-        retriever: VectorStore = Depends(get_retriever),
-    ):
+    request: QARequest,
+    model: QAModel = Depends(get_qa_model),
+    retriever: VectorStore = Depends(get_retriever),
+):
     """
     Predict the answer to a question based on the provided context.
 
@@ -53,10 +59,7 @@ async def predict(
     if settings.rag_mode.lower() == "generative":
         logger.info("Using RAG generative mode")
         # Build RAG prompt
-        prompt = build_rag_prompt(
-            question=request.question,
-            context=context
-        )
+        prompt = build_rag_prompt(question=request.question, context=context)
         # Run generative model
         generator = Generator()
         answer = generator.generate(prompt)
@@ -64,22 +67,17 @@ async def predict(
     else:
         logger.info("Using RAG extractive mode")
         # Use extractive QA model
-        result = model.predict(
-            question=request.question,
-            context=context
-        )
+        result = model.predict(question=request.question, context=context)
         answer = result["answer"]
         score = result["score"]
 
-    return {
-        "answer": answer,
-        "score": score,
-        "source": [doc["source"] for doc in docs]
-    }
+    return {"answer": answer, "score": score, "source": [doc["source"] for doc in docs]}
+
 
 @app.get("/")
 async def root():
     return {"Message": "Hello, change the url to /docs to see the API documentation."}
+
 
 @app.get("/version")
 async def version():

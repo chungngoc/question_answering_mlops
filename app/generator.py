@@ -1,9 +1,10 @@
 import threading
 import torch
-from transformers import  AutoTokenizer, AutoModelForSeq2SeqLM
+from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 from app.logging import get_logger
 
 logger = get_logger(__name__)
+
 
 # Singleton class to manage the generative model (FLAN-T5)
 class Generator:
@@ -27,9 +28,11 @@ class Generator:
         if torch.cuda.is_available():
             self.model.to("cuda")
             logger.info("Generative model moved to GPU")
-    
+
     def generate(self, prompt: str) -> str:
-        inputs = self.tokenizer(prompt, return_tensors="pt", truncation=True, max_length=512)
+        inputs = self.tokenizer(
+            prompt, return_tensors="pt", truncation=True, max_length=512
+        )
         logger.info(f"Generating response for prompt: {prompt}")
         with torch.no_grad():
             outputs = self.model.generate(

@@ -4,6 +4,7 @@ from app.logging import get_logger
 
 logger = get_logger(__name__)
 
+
 class EmbeddingModel:
     # Singleton instance
     _instance = None
@@ -19,16 +20,14 @@ class EmbeddingModel:
                     cls._instance._load_model()
                     logger.info("Embedding model loaded successfully.")
         return cls._instance
-    
+
     def _load_model(self):
-        self.model = SentenceTransformer(
-            "sentence-transformers/all-MiniLM-L6-v2"
-        )
-    
+        self.model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
+
     def encode(self, texts: list[str]):
         return self.model.encode(
             texts,
             show_progress_bar=False,
             convert_to_numpy=True,
-            normalize_embeddings=True
+            normalize_embeddings=True,
         )

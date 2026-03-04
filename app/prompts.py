@@ -1,4 +1,4 @@
-def build_rag_prompt(question: str, context:str) -> str:
+def build_rag_prompt(question: str, context: str) -> str:
     """
     Build a grounnded prompt for RAG-based question answering.
     """

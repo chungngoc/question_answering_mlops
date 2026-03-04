@@ -9,9 +9,11 @@ from typing import List
 #     answer: str
 #     score: float
 
+
 # Updated schemas to include source information in the response (for RAG)
 class QARequest(BaseModel):
     question: str
+
 
 class QAResponse(BaseModel):
     answer: str

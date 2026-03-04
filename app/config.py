@@ -1,5 +1,6 @@
 from pydantic_settings import BaseSettings
 
+
 class Settings(BaseSettings):
     # Application settings
     app_name: str = "Question Answering API"
@@ -21,5 +22,6 @@ class Settings(BaseSettings):
     class Config:
         env_prefix = ""
         case_sensitive = False
+
 
 settings = Settings()

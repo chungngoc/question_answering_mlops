@@ -5,11 +5,13 @@ from app.config import settings
 
 logger = get_logger(__name__)
 
+
 class QAModel:
-    '''
-        Singleton class to load the question-answering model and make predictions.
-        Model is loaded only once and shared across the application.
-    '''
+    """
+    Singleton class to load the question-answering model and make predictions.
+    Model is loaded only once and shared across the application.
+    """
+
     _instance = None
     _lock = threading.Lock()
 
@@ -24,14 +26,8 @@ class QAModel:
         return cls._instance
 
     def _load_model(self):
-        self.pipeline = pipeline(
-            "question-answering",
-            model=settings.model_name
-        )
+        self.pipeline = pipeline("question-answering", model=settings.model_name)
 
-    def predict(self, question:str, context:str)-> dict:
-        result = self.pipeline(
-            question=question,
-            context=context
-        )
+    def predict(self, question: str, context: str) -> dict:
+        result = self.pipeline(question=question, context=context)
         return result
